@@ -1,0 +1,19 @@
+services:
+  proxy:
+    image: ghcr.io/marginswitch/proxy:latest
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+      GOMEMLIMIT: "200MiB"
+      MS_PROXY_TOKEN: "${MS_PROXY_TOKEN:-change_me_32_byte_secret}"
+      MS_SHADOW_MODE: "${MS_SHADOW_MODE:-1}"
+      REDIS_URL: "redis://redis:6379"
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no", "--maxmemory", "64mb", "--maxmemory-policy", "noeviction"]
